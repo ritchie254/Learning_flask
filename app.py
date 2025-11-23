@@ -2,7 +2,7 @@ from flask import Flask, render_template, redirect, url_for, flash, request, Blu
 from flask_wtf import FlaskForm
 from flask_sqlalchemy import SQLAlchemy
 from wtforms import StringField, SubmitField, PasswordField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, EqualTo
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_migrate import Migrate
@@ -50,7 +50,27 @@ class LoginUser(db.Model):
 class LoginForm(FlaskForm):
     email = StringField('Email', validators=[ DataRequired() ])
     password = PasswordField('Passsword', validators=[ DataRequired() ])
-    submit = SubmitField('Sign In')
+    submit = SubmitField('Sign in')
+
+class SignupForm(FlaskForm):
+    FirstName = StringField('First Name', validators=[ DataRequired() ])
+    LastName = StringField('Last Name', validators=[ DataRequired() ])
+    email = StringField('Email', validators=[ DataRequired() ])
+    password = PasswordField('Passsword', validators=[ DataRequired(), EqualTo('confirmPassword') ])
+    confirmPassword = PasswordField('Confirm Passsword', validators=[ DataRequired() ])
+    submit = SubmitField('Sign up')
+
+
+class SignupUser(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    FirstName = db.Column(db.String(120), nullable=False)
+    LastName = db.Column(db.String(120), nullable=False)
+    email = db.Column(db.String(120), nullable=False)
+    password = db.Column(db.String(200), nullable=False)
+
+    def __repr__(self):
+        return self.FirstName + ' ' + self.LastName
+
 
 class NameForm(FlaskForm):
     """
@@ -104,9 +124,43 @@ def login():
     if request.method == 'POST':
         email = request.form['email']
         password = generate_password_hash(request.form['password'])
-
         user = LoginUser(email=email, password=password)
+
         db.session.add(user)
         db.session.commit()
+        flash('user logged in  successfully')
         return redirect(url_for('home'))
-    return render_template('login_prac.html', form=form)
+    return render_template('login.html', form=form)
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    form = SignupForm()
+
+    if request.method == 'POST':
+        firstname = request.form['FirstName']
+        lastname = request.form['LastName']
+        email = request.form['email']
+        password = generate_password_hash(request.form['password'])
+        conpassword = request.form['confirmPassword']
+
+        new = SignupUser(FirstName=firstname, LastName=lastname, email=email, password=password)
+        db.session.add(new)
+        db.session.commit()
+        flash('user created successfully')
+        return redirect(url_for('login'))
+    return render_template('signup.html', form=form)
+
+
+@app.route('/delete/<int:id>', methods=['GET', 'POST'])
+def delete(id):
+    form = UserForm()
+    userToDelete = User.query.get_or_404(id)
+
+    try:
+        db.session.delete(userToDelete)
+        db.session.commit()
+        flash('user deleted')
+        all_users = User.query.order_by(User.date_created)
+        return redirect(url_for('user'))
+    except Exception as e:
+        flash('No user found')

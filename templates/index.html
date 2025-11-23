@@ -15,7 +15,7 @@
         <header>
             <nav class="navbar navbar-expand-lg bg-body-tertiary mb-2">
                   <div class="container">
-                      <a class="navbar-brand h1" href="{{ url_for('home') }}">BLOGGER</a>
+                      <a class="navbar-brand h1 text-primary" href="{{ url_for('home') }}">BLOGGER</a>
                               <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                                         <span class="navbar-toggler-icon"></span>
                                             </button>
@@ -53,7 +53,13 @@
                                                                                                                                                                                                                                                                                                                                     </div>
             </nav>
         </header>
-        <main class='container mt-5'>
+        <main class='container mt-1'>
+            {% for messages in get_flashed_messages() %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ messages }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
         {% block content %}
         {% endblock content %}
         </main>

@@ -1,4 +1,55 @@
 {% extends 'index.html' %}
 {% block content %}
-hello
+{% for messages in get_flashed_messages() %}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+    {{ messages }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% if name %}
+    <h1> Hello {{ name }} </h1><br>
+    {% for user in all_users %}
+        {{ user.name }}-{{ user.email }}<br>
+    {% endfor %}
+{% else %}
+    <form method='POST' class='login' action='/login'>
+        <div class='all'>
+            <div class='move'>
+                <div class='left border rounded-pill'>
+                    <div>
+                        <a href='{{ url_for("login") }}'>Sign In</a>
+                    </div>
+                    <div>
+                        <a href='{{ url_for("signup") }}'>Sign Up</a>
+                    </div>
+                </div>
+                <p>X</p>
+            </div>
+            <div class='tag'>
+                <h1 class='text-primary'>Welcome back</h1>
+                <p>Sign in to continue to your Account</p>
+            </div>
+            <div class='i'>
+            {{ form.hidden_tag() }}
+            {{ form.email(class='entry border rounded-pill', placeholder='Enter email') }}
+            </div>
+            <div class='i'>
+            {{ form.password(class='entry border rounded-pill', placeholder='Enter password') }}
+            </div>
+            <div class='forgot'>
+                <p>Forgot Password?</p>
+            </div>
+            {{ form.submit(class='btn btn-primary border rounded-pill mine') }}
+            <button class='btn border border-dark rounded-pill mt-2 tm'>
+                <img src="{{ url_for('static', filename='images/google.svg') }}"/>
+                <p>continue with google</p>
+            </button>
+            <button class='btn border border-dark rounded-pill mt-2 tm'>
+                <img src="{{ url_for('static', filename='images/fb.svg') }}"/>
+                <p>continue with facebook<p>
+            </button>
+
+        </div>
+    </form>
+{% endif %}
 {% endblock content %}
