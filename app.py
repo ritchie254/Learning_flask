@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, flash, request, Blueprint
+from flask import Flask, render_template, redirect, url_for, flash, request, Blueprint, jsonify
 from flask_wtf import FlaskForm
 from flask_sqlalchemy import SQLAlchemy
 from wtforms import StringField, SubmitField, PasswordField
@@ -69,8 +69,17 @@ class SignupUser(db.Model):
     password = db.Column(db.String(200), nullable=False)
 
     def __repr__(self):
-        return self.FirstName + ' ' + self.LastName
+        return self.FirstName
 
+class BlogPost(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(120), nullable=False)
+    author = db.Column(db.String(120), nullable=False)
+    slug = db.Column(db.String(120), nullable=False)
+    content = db.Column(db.String(120), nullable=False)
+
+    def __repr__(self):
+        return self.title
 
 class NameForm(FlaskForm):
     """
@@ -82,7 +91,8 @@ class NameForm(FlaskForm):
 
 @app.route('/', strict_slashes=False)
 def home():
-    return render_template('index.html', name='home_page')
+    posts = BlogPost.query.order_by(BlogPost.id.desc()).all()
+    return render_template('index.html', name='home_page', posts=posts)
 
 @app.route('/name', methods=['GET', 'POST'])
 def name():
@@ -155,12 +165,61 @@ def signup():
 def delete(id):
     form = UserForm()
     userToDelete = User.query.get_or_404(id)
+    blogToDelete = BlogPost.query.get_or_404(id)
 
     try:
-        db.session.delete(userToDelete)
+        db.session.delete(blogToDelete)
         db.session.commit()
         flash('user deleted')
         all_users = User.query.order_by(User.date_created)
-        return redirect(url_for('user'))
+        return redirect(url_for('home'))
     except Exception as e:
         flash('No user found')
+
+@app.route('/postdelete/<int:id>', methods=['GET', 'POST'])
+def deletepost(id):
+    blogToDelete = BlogPost.query.get_or_404(id)
+
+    try:
+        db.session.delete(blogToDelete)
+        db.session.commit()
+        flash('Post deleted successfully')
+        return redirect(url_for('home'))
+    except Exception as e:
+        pass
+
+@app.route('/dict', methods=['GET', 'POST'])
+def get_user():
+    all = {
+            'name': 'richard',
+            'lastname': 'oduor',
+            'age': 20,
+            'gender': 'male',
+            'hobbies': ['football', 'music', 'movies'],
+            'others': {
+                'parents': True,
+                'siblings': 4,
+                'left': False
+                },
+            }
+    return jsonify(all)
+
+@app.route('/blog', methods=['GET', 'POST'])
+def blog():
+    if request.method == 'POST':
+        title = request.form['title']
+        author = request.form['author']
+        slug = request.form['slug']
+        content = request.form['content']
+
+        post = BlogPost(title=title, author=author, slug=slug, content=content)
+        db.session.add(post)
+        db.session.commit()
+        return redirect(url_for('home'))
+
+    return render_template('blog.html')
+
+
+@app.errorhandler(404)
+def notFound(e):
+    return render_template('404.html')

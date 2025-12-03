@@ -1,0 +1,14 @@
+{% extends 'index.html' %}
+{% block content %}
+<form action='/blog' class='blog' method='post'>
+    <label for='title' class='form-label'>Title</label>
+    <input type='text' name='title' id='title'class='form-control' placeholder='Blog Title' />
+    <label for='author'>Author</label>
+    <input type='text' name='author' id='author' placeholder='Author' />
+    <label for='slug'>Slug</label>
+    <input type='text' name='slug' id='slug' placeholder='Slug' />
+    <label for='content'>Content</label>
+    <textarea type='text' name='content' rows='6' id='content' placeholder='Content'></textarea>
+    <button class='btn btn-primary col-3'>Submit</button>
+</form>
+{% endblock content %}
