@@ -6,6 +6,7 @@ from wtforms.validators import DataRequired, EqualTo
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_migrate import Migrate
+from flask_login import UserMixin, LoginManager, login_required, login_user, logout_user
 
 
 
@@ -22,6 +23,14 @@ app.config['SECRET_KEY'] = '1234567890'
 db = SQLAlchemy(app)
 
 migrate = Migrate(app, db)
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = '/login'
+
+@login_manager.user_loader
+def load_user(user_id):
+    return SignupUser.query.get(int(user_id))
 
 #for the database
 class User(db.Model):
@@ -61,11 +70,11 @@ class SignupForm(FlaskForm):
     submit = SubmitField('Sign up')
 
 
-class SignupUser(db.Model):
+class SignupUser(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     FirstName = db.Column(db.String(120), nullable=False)
     LastName = db.Column(db.String(120), nullable=False)
-    email = db.Column(db.String(120), nullable=False)
+    email = db.Column(db.String(120), nullable=False, unique=True)
     password = db.Column(db.String(200), nullable=False)
 
     def __repr__(self):
@@ -90,9 +99,10 @@ class NameForm(FlaskForm):
 
 
 @app.route('/', strict_slashes=False)
+@login_required
 def home():
     posts = BlogPost.query.order_by(BlogPost.id.desc()).all()
-    return render_template('index.html', name='home_page', posts=posts)
+    return render_template('dashboard.html', name='home_page', posts=posts)
 
 @app.route('/name', methods=['GET', 'POST'])
 def name():
@@ -131,16 +141,25 @@ def user():
 def login():
     form = LoginForm()
 
-    if request.method == 'POST':
-        email = request.form['email']
-        password = generate_password_hash(request.form['password'])
-        user = LoginUser(email=email, password=password)
+    if form.validate_on_submit():
+        user = SignupUser.query.filter_by(email=form.email.data).first()
 
-        db.session.add(user)
-        db.session.commit()
-        flash('user logged in  successfully')
-        return redirect(url_for('home'))
+        if user:
+            if check_password_hash(user.password, form.password.data):
+                login_user(user)
+                flash('Logged in successfully')
+                return redirect(url_for('home'))
+            else:
+                flash('Incorrect password')
+        else:
+            flash('User Doesn\'t Exist')
     return render_template('login.html', form=form)
+
+@app.route('/logout', methods=['GET', 'POST'])
+def logout():
+    logout_user()
+    flash('logged out succeffully')
+    return redirect(url_for('login'))
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
