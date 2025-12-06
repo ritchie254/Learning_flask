@@ -219,6 +219,28 @@ def blog():
 
     return render_template('blog.html')
 
+@app.route('/blog/edit/<int:id>', methods=['GET', 'POST'])
+def edit(id):
+    post = BlogPost.query.get_or_404(id)
+
+    try:
+        """
+        if request.method=='post':
+            post.title = request.form['title']
+            post.author = request.form['author']
+            post.slug = request.form['slug']
+            post.content = request.form['content']
+
+            db.session.commit()
+            flash('Post updated successfully')
+            return redirect(url_for('home', id=id))
+        """
+        BlogPost.query.filter_by(id=post.id).update({post.title: request.form['title'],post.author: request.form['author'],post.slug: request.form['slug'],post.content: request.form['content']})
+        db.session.commit()
+        return redirect(url_for('home', id=id))
+    except Exception as e:
+        pass
+    return render_template('blog.html')
 
 @app.errorhandler(404)
 def notFound(e):
