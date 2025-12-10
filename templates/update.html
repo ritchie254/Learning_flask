@@ -1,13 +1,12 @@
 {% extends 'index.html' %}
 {% block content %}
 <form method='post' class='shadow border border-4 p-3 mt-3' action='/dashboard/update/{{ user.id }}'>
-    {{ form.hidden_tag() }}
-    {{ form.FirstName.label(class='form-label') }}
-    {{ form.FirstName(class='form-control', value= current_user.FirstName)}}
-    {{ form.LastName.label(class='form-label') }}
-    {{ form.LastName(class='form-control', value= current_user.LastName) }}
-    {{ form.email.label(class='form-label') }}
-    {{ form.email(class='form-control', value= current_user.email) }}
-    <a href='{{ url_for('updateUser', id=user.id) }}' class='btn btn-success mt-3'>Update</a>
+    <label class='form-label' for='fn'>Firstname</label>
+    <input type='text',class='form-control', id='fn', name='FirstName', value={{ current_user.FirstName }} />
+    <label class='form-label' for='ln'>Lastname</label>
+    <input type='text', class='form-control', id='ln', name='LastName', value={{ current_user.LastName }} />
+    <label class='form-label' for='em'>Email</label>
+    <input type='email', class='form-control', id='em', name='email', value={{ current_user.email }} />
+    <button class='btn btn-secondary mt-2'>Update</button>
 </form>
 {% endblock %}

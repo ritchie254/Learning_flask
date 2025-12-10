@@ -222,8 +222,7 @@ def updateUser(id):
         except Exception as e:
             flash('Error!! User not found')
             return redirect(url_for('dashboard'))
-    else:
-        return render_template('update.html', form=form, user=user)
+    return render_template('update.html', form=form, user=user)
 
 @app.route('/delete/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -304,24 +303,18 @@ def blog():
 def edit(id):
     post = BlogPost.query.get_or_404(id)
 
-    try:
-        """
-        if request.method=='post':
-            post.title = request.form['title']
-            post.author = request.form['author']
-            post.slug = request.form['slug']
-            post.content = request.form['content']
-
+    if request.method=='POST':
+        post.title = request.form['title']
+        post.author = request.form['author']
+        post.slug = request.form['slug']
+        post.content = request.form['content']
+        try:
             db.session.commit()
             flash('Post updated successfully')
-            return redirect(url_for('home', id=id))
-        """
-        BlogPost.query.filter_by(id=post.id).update({post.title: request.form['title'],post.author: request.form['author'],post.slug: request.form['slug'],post.content: request.form['content']})
-        db.session.commit()
-        return redirect(url_for('home', id=id))
-    except Exception as e:
-        pass
-    return render_template('blog.html')
+            return redirect(url_for('home'))
+        except Exception as e:
+            pass
+    return render_template('blog_edit.html', post=post)
 
 @app.errorhandler(404)
 def notFound(e):
