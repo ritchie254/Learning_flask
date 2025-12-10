@@ -1,12 +1,12 @@
 {% extends 'index.html' %}
 {% block content %}
-<form method='post' class='shadow border border-4 p-3 mt-3' action='/dashboard/update/{{ user.id }}'>
+<form method='post' class='shadow border border-success bg-info bg-opacity-10 rounded-5 p-4 mt-4' action='/dashboard/update/{{ user.id }}'>
     <label class='form-label' for='fn'>Firstname</label>
-    <input type='text',class='form-control', id='fn', name='FirstName', value={{ current_user.FirstName }} />
+    <input type='text' class='form-control' id='fn' name='FirstName' value={{ current_user.FirstName }} />
     <label class='form-label' for='ln'>Lastname</label>
-    <input type='text', class='form-control', id='ln', name='LastName', value={{ current_user.LastName }} />
+    <input type='text' class='form-control' id='ln' name='LastName' value={{ current_user.LastName }} />
     <label class='form-label' for='em'>Email</label>
-    <input type='email', class='form-control', id='em', name='email', value={{ current_user.email }} />
-    <button class='btn btn-secondary mt-2'>Update</button>
+    <input type='email' class='form-control' id='em' name='email' value={{ current_user.email }} />
+    <button class='btn btn-success mt-3 col-3'>Update</button>
 </form>
 {% endblock %}
