@@ -89,12 +89,15 @@ body {
     margin-top: 10px;
     color: blue;
 }
+.forgot a {
+    text-decoration: none;
+    font-size: 1.3rem;
+}
 
 .mine {
     height: 45px;
     font-size: 1.2rem;
 }
-
 .tm {
     display: flex;
     justify-content: center;

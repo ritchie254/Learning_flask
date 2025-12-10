@@ -1,0 +1,13 @@
+{% extends 'index.html' %}
+{% block content %}
+<form method='post' class='shadow border border-4 p-3 mt-3' action='/dashboard/update/{{ user.id }}'>
+    {{ form.hidden_tag() }}
+    {{ form.FirstName.label(class='form-label') }}
+    {{ form.FirstName(class='form-control', value= current_user.FirstName)}}
+    {{ form.LastName.label(class='form-label') }}
+    {{ form.LastName(class='form-control', value= current_user.LastName) }}
+    {{ form.email.label(class='form-label') }}
+    {{ form.email(class='form-control', value= current_user.email) }}
+    <a href='{{ url_for('updateUser', id=user.id) }}' class='btn btn-success mt-3'>Update</a>
+</form>
+{% endblock %}

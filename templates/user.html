@@ -1,15 +1,14 @@
 {% extends 'index.html' %}
 {% block content %}
 {% if name %}
-{% for messages in get_flashed_messages() %}
-<div class="alert alert-success alert-dismissible fade show" role="alert">
-    {{ messages }}
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-</div>
-{% endfor %}
     <h1> Hello {{ name }} </h1><br>
     {% for user in all_users %}
-        {{ user.name }}-{{ user.email }}<br>
+    <div class='d-flex gap-3 mb-3'>
+        <div>{{ user.id }}{{ user.name }}-{{ user.email }} 
+        </div>
+        <a href='{{ url_for('update', id=user.id)}}' class='btn btn-primary'>Update</a>
+        <a href='{{ url_for('deleteuser', id=user.id)}}' class='btn btn-warning'>Delete</a>
+    </div>
     {% endfor %}
 {% else %}
     <form method='POST'>

@@ -102,7 +102,12 @@ class NameForm(FlaskForm):
 @login_required
 def home():
     posts = BlogPost.query.order_by(BlogPost.id.desc()).all()
-    return render_template('dashboard.html', name='home_page', posts=posts)
+    return render_template('home.html', name='home_page', posts=posts)
+
+@app.route('/dashboard', methods=['GET','POST'])
+@login_required
+def dashboard():
+    return render_template('dashboard.html')
 
 @app.route('/name', methods=['GET', 'POST'])
 def name():
@@ -117,6 +122,7 @@ def name():
     return render_template('name.html', name=name, form=form)
 
 @app.route('/user/add', methods=['GET', 'POST'])
+@login_required
 def user():
     name = ''
     form = UserForm()
@@ -136,6 +142,25 @@ def user():
     all_users = User.query.order_by(User.date_created)
     return render_template('user.html', name=name, form=form, all_users=all_users)
 
+@app.route('/update/<int:id>', methods=['GET', 'POST'])
+@login_required
+def update(id):
+    user = User.query.get_or_404(id)
+    form = UserForm()
+
+    if request.method == 'POST':
+        user.name = request.form['name']
+        user.email = request.form['email']
+        all_users = User.query.order_by(User.date_created)
+
+        try:
+            db.session.commit()
+            flash('user updated succcessfully')
+            return render_template('user.html', name=user.name, form=form, all_users=all_users)
+        except Exception as e:
+            flash('user not found')
+            return render_template('user.html', name=user.name, form=form, all_users=all_users)
+    return render_template('update1.html', user=user, form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -179,8 +204,29 @@ def signup():
         return redirect(url_for('login'))
     return render_template('signup.html', form=form)
 
+@app.route('/dashboard/update/<int:id>', methods=['GET','POST'])
+@login_required
+def updateUser(id):
+    user = SignupUser.query.get_or_404(id)
+    form = SignupForm()
+    
+    if request.method == 'POST':
+        user.FirstName = request.form['FirstName']
+        user.LastName = request.form['LastName']
+        user.email = request.form['email']
+
+        try:
+            db.session.commit()
+            flash('User updated successfully')
+            return redirect(url_for('dashboard'))
+        except Exception as e:
+            flash('Error!! User not found')
+            return redirect(url_for('dashboard'))
+    else:
+        return render_template('update.html', form=form, user=user)
 
 @app.route('/delete/<int:id>', methods=['GET', 'POST'])
+@login_required
 def delete(id):
     form = UserForm()
     userToDelete = User.query.get_or_404(id)
@@ -194,6 +240,21 @@ def delete(id):
         return redirect(url_for('home'))
     except Exception as e:
         flash('No user found')
+
+@app.route('/deleteuser/<int:id>', methods=['GET', 'POST'])
+@login_required
+def deleteuser(id):
+    form = UserForm()
+    userToDelete = User.query.get_or_404(id)
+    all_users = User.query.order_by(User.date_created)
+    try:
+        db.session.delete(userToDelete)
+        db.session.commit()
+        flash('user deleted successfully')
+        return render_template('user.html', name='hello', form=form, all_users=all_users)
+    except Exception as e:
+        flash('user not found')
+
 
 @app.route('/postdelete/<int:id>', methods=['GET', 'POST'])
 def deletepost(id):
@@ -224,6 +285,7 @@ def get_user():
     return jsonify(all)
 
 @app.route('/blog', methods=['GET', 'POST'])
+@login_required
 def blog():
     if request.method == 'POST':
         title = request.form['title']

@@ -31,17 +31,9 @@
             {{ form.password(class='entry border rounded-pill', placeholder='Enter password') }}
             </div>
             <div class='forgot'>
-                <p>Forgot Password?</p>
+                <a href='#'>Forgot Password?</a>
             </div>
             {{ form.submit(class='btn btn-primary border rounded-pill mine') }}
-            <button class='btn border border-dark rounded-pill mt-2 tm'>
-                <img src="{{ url_for('static', filename='images/google.svg') }}"/>
-                <p>continue with google</p>
-            </button>
-            <button class='btn border border-dark rounded-pill mt-2 tm'>
-                <img src="{{ url_for('static', filename='images/fb.svg') }}"/>
-                <p>continue with facebook<p>
-            </button>
 
         </div>
     </form>
