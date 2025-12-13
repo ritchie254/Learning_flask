@@ -6,7 +6,7 @@ from wtforms.validators import DataRequired, EqualTo
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_migrate import Migrate
-from flask_login import UserMixin, LoginManager, login_required, login_user, logout_user
+from flask_login import UserMixin, LoginManager, login_required, login_user, logout_user, current_user
 
 
 
@@ -79,6 +79,7 @@ class SignupUser(db.Model, UserMixin):
     email = db.Column(db.String(120), nullable=False, unique=True)
     date_created = db.Column(db.DateTime, default=datetime.utcnow)
     password = db.Column(db.String(200), nullable=False)
+    posts = db.Relationship('BlogPost', backref='poster')
 
     def __repr__(self):
         return self.FirstName
@@ -89,6 +90,7 @@ class BlogPost(db.Model):
     author = db.Column(db.String(120), nullable=False)
     slug = db.Column(db.String(120), nullable=False)
     content = db.Column(db.String(120), nullable=False)
+    poster_id = db.Column(db.Integer, db.ForeignKey('signup_user.id'))
 
     def __repr__(self):
         return self.title
@@ -292,12 +294,13 @@ def get_user():
 @login_required
 def blog():
     if request.method == 'POST':
+        poster = current_user.id
         title = request.form['title']
         author = request.form['author']
         slug = request.form['slug']
         content = request.form['content']
 
-        post = BlogPost(title=title, author=author, slug=slug, content=content)
+        post = BlogPost(title=title, author=author, slug=slug, content=content, poster_id=poster)
         db.session.add(post)
         db.session.commit()
         return redirect(url_for('home'))
@@ -305,6 +308,7 @@ def blog():
     return render_template('blog.html')
 
 @app.route('/blog/edit/<int:id>', methods=['GET', 'POST'])
+@login_required
 def edit(id):
     post = BlogPost.query.get_or_404(id)
 

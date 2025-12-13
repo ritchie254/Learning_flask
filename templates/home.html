@@ -3,7 +3,7 @@
 {% for post in posts %}
     <div class='shadow border rounded-1 p-3 mb-4 bg-body-secondary text-black'>
         <h2 class='text-primary display-4 border-bottom border-success'>{{ post.title }}    </h2>
-        <p class='display-6'>{{ post.author }}</p>
+        <p class='display-6'><strong>Posted by: </strong>{{ post.poster.username }}</p>
         <p>{{ post.content }}</p>
         <div class='d-flex justify-content-end gap-2'>
             <a href="{{ url_for('edit', id=post.id) }}" class='btn btn-success col-2'>Update</a>
