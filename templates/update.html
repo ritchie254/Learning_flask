@@ -1,6 +1,8 @@
 {% extends 'index.html' %}
 {% block content %}
 <form method='post' class='shadow border border-success bg-info bg-opacity-10 rounded-5 p-4 mt-4' action='/dashboard/update/{{ user.id }}'>
+    <label class='form-label' for='fn'>UserName</label>
+    <input type='text' class='form-control' id='fn' name='username' value={{ current_user.username }} />
     <label class='form-label' for='fn'>Firstname</label>
     <input type='text' class='form-control' id='fn' name='FirstName' value={{ current_user.FirstName }} />
     <label class='form-label' for='ln'>Lastname</label>

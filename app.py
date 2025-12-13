@@ -57,11 +57,12 @@ class LoginUser(db.Model):
         return self.email
 
 class LoginForm(FlaskForm):
-    email = StringField('Email', validators=[ DataRequired() ])
+    username = StringField('Username', validators=[ DataRequired() ])
     password = PasswordField('Passsword', validators=[ DataRequired() ])
     submit = SubmitField('Sign in')
 
 class SignupForm(FlaskForm):
+    username = StringField('Username', validators=[ DataRequired() ])
     FirstName = StringField('First Name', validators=[ DataRequired() ])
     LastName = StringField('Last Name', validators=[ DataRequired() ])
     email = StringField('Email', validators=[ DataRequired() ])
@@ -72,9 +73,11 @@ class SignupForm(FlaskForm):
 
 class SignupUser(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(120), nullable=False, unique=True)
     FirstName = db.Column(db.String(120), nullable=False)
     LastName = db.Column(db.String(120), nullable=False)
     email = db.Column(db.String(120), nullable=False, unique=True)
+    date_created = db.Column(db.DateTime, default=datetime.utcnow)
     password = db.Column(db.String(200), nullable=False)
 
     def __repr__(self):
@@ -167,7 +170,7 @@ def login():
     form = LoginForm()
 
     if form.validate_on_submit():
-        user = SignupUser.query.filter_by(email=form.email.data).first()
+        user = SignupUser.query.filter_by(username=form.username.data).first()
 
         if user:
             if check_password_hash(user.password, form.password.data):
@@ -191,13 +194,14 @@ def signup():
     form = SignupForm()
 
     if request.method == 'POST':
+        username = request.form['username']
         firstname = request.form['FirstName']
         lastname = request.form['LastName']
         email = request.form['email']
         password = generate_password_hash(request.form['password'])
         conpassword = request.form['confirmPassword']
 
-        new = SignupUser(FirstName=firstname, LastName=lastname, email=email, password=password)
+        new = SignupUser(username=username, FirstName=firstname, LastName=lastname, email=email, password=password)
         db.session.add(new)
         db.session.commit()
         flash('user created successfully')
@@ -211,6 +215,7 @@ def updateUser(id):
     form = SignupForm()
     
     if request.method == 'POST':
+        user.username = request.form['username']
         user.FirstName = request.form['FirstName']
         user.LastName = request.form['LastName']
         user.email = request.form['email']

@@ -4,9 +4,10 @@
       <div class="card-header text-primary">
           <h1>Your Dashboard</h1>
       </div>
-      <div class="card-body">
+      <div class="card-body p-3">
           <h5 class="card-title">Welcome to your account dashboard</h5>
           <p class="card-text">
+          <strong>UserName: </strong>{{ current_user.username }}<br>
           <strong>First Name: </strong>{{ current_user.FirstName }}<br>
           <strong>Last Name: </strong>{{ current_user.LastName }}<br>
           <strong>Email: </strong>{{ current_user.email }}<br>
@@ -15,4 +16,22 @@
           <a href="{{ url_for('updateUser', id=current_user.id) }}" class="btn btn-secondary col-3">Update</a>
                                     </div>
 </div>
+<div class="card mt-5 border-primary">
+    <div class="card-header text-primary text-center">
+        <h1>Update User</h1>
+    </div>
+    <div class="card-body">
+<form method='post' class='p-4' action='/dashboard/update/{{ current_user.id }}'>
+    <label class='form-label' for='fn'>Username</label>
+    <input type='text' class='form-control' id='fn' name='username' value={{ current_user.username }} />  
+    <label class='form-label' for='fn'>Firstname</label>
+    <input type='text' class='form-control' id='fn' name='FirstName' value={{ current_user.FirstName }} />
+    <label class='form-label' for='ln'>Lastname</label>
+    <input type='text' class='form-control' id='ln' name='LastName' value={{ current_user.LastName }} />
+    <label class='form-label' for='em'>Email</label>
+    <input type='email' class='form-control' id='em' name='email' value={{ current_user.email }} />
+    <button class='btn btn-secondary mt-5 col-3'>Update</button>
+</form>
+    </div>
+ </div>
 {% endblock %}
