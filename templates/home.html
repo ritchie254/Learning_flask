@@ -5,10 +5,12 @@
         <h2 class='text-primary display-4 border-bottom border-success'>{{ post.title }}    </h2>
         <p class='display-6'><strong>Posted by: </strong>{{ post.poster.username }}</p>
         <p>{{ post.content }}</p>
+        {% if  post.poster_id == current_user.id %}
         <div class='d-flex justify-content-end gap-2'>
             <a href="{{ url_for('edit', id=post.id) }}" class='btn btn-success col-2'>Update</a>
             <a href="{{ url_for('deletepost', id=post.id) }}" class='btn btn-danger col-2'>Delete</a>
         </div>
+        {% endif %}
     </div>
     {% endfor %}
 {% endblock %}

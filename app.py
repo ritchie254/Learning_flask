@@ -265,14 +265,19 @@ def deleteuser(id):
 @app.route('/postdelete/<int:id>', methods=['GET', 'POST'])
 def deletepost(id):
     blogToDelete = BlogPost.query.get_or_404(id)
+    post_owner = current_user.id
 
-    try:
-        db.session.delete(blogToDelete)
-        db.session.commit()
-        flash('Post deleted successfully')
+    if post_owner == blogToDelete.poster_id:
+        try:
+            db.session.delete(blogToDelete)
+            db.session.commit()
+            flash('Post deleted successfully')
+            return redirect(url_for('home'))
+        except Exception as e:
+            pass
+    else: 
+        flash('You can not delete this post since you are not the owner')
         return redirect(url_for('home'))
-    except Exception as e:
-        pass
 
 @app.route('/dict', methods=['GET', 'POST'])
 def get_user():
@@ -311,18 +316,23 @@ def blog():
 @login_required
 def edit(id):
     post = BlogPost.query.get_or_404(id)
+    post_owner = current_user.id
 
     if request.method=='POST':
-        post.title = request.form['title']
-        post.author = request.form['author']
-        post.slug = request.form['slug']
-        post.content = request.form['content']
-        try:
-            db.session.commit()
-            flash('Post updated successfully')
+        if post_owner == post.poster_id:
+            post.title = request.form['title']
+            post.author = request.form['author']
+            post.slug = request.form['slug']
+            post.content = request.form['content']
+            try:
+                db.session.commit()
+                flash('Post updated successfully')
+                return redirect(url_for('home'))
+            except Exception as e:
+                pass
+        else:
+            flash('Your can not edit this post since you are not the owner')
             return redirect(url_for('home'))
-        except Exception as e:
-            pass
     return render_template('blog_edit.html', post=post)
 
 @app.errorhandler(404)
