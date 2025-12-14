@@ -102,6 +102,15 @@ class NameForm(FlaskForm):
     name = StringField('whats your name', validators=[ DataRequired() ])
     submit = SubmitField('submit')
 
+#create a search form
+class SearchForm(FlaskForm):
+    searched = StringField('search', validators=[ DataRequired() ])
+    submit = SubmitField('submit')
+#pass things such as forms to mutiple pages
+@app.context_processor
+def index():
+    form = SearchForm()
+    return dict(form=form)
 
 @app.route('/', strict_slashes=False)
 @login_required
@@ -125,6 +134,20 @@ def name():
         #return redirect(url_for('home'))
         flash('User created successfully')
     return render_template('name.html', name=name, form=form)
+
+@app.route('/search', methods=['POST'])
+def search():
+    #for the search functionality
+    form = SearchForm()
+    posts = BlogPost.query
+    if request.method == 'POST':
+        searched = request.form['searched']
+        posts = posts.filter(BlogPost.content.like('%' + searched + '%')).all()
+        if posts:
+            return render_template('search.html', form=form, searched=searched, posts=posts)
+        else:
+            flash(f'No results for {searched} found')
+            return redirect(url_for('home'))
 
 @app.route('/user/add', methods=['GET', 'POST'])
 @login_required
