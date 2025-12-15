@@ -1,19 +1,22 @@
 {% extends 'index.html' %}
 {% block content %}
 {% for post in posts %}
-    <div class='shadow p-3 mb-4 bg-body-secondary text-black'>
-        <div class='d-flex mb-2 gap-2'>
-        <img width='100' height='100' class="object-fit-cover border rounded-circle border-primary border-5 p-1" src="{{ url_for('static', filename='images/'+ (post.poster.profile_pic or 'cat.jpg')) }} "/>
-        <h2 class='text-primary display-4 border-bottom border-success'>{{ post.poster.username }}    </h2>
+    <div class='shadow p-3 mt-4 bg-body-secondary text-black border border-primary'>
+        <div class='d-flex mb-2 align-items-center justify-content-between'>
+        <div class='d-flex gap-2 align-items-center'>
+        <img width='65' height='65' class="object-fit-cover border rounded-circle border-primary border-3 p-1" src="{{ url_for('static', filename='images/'+ (post.poster.profile_pic or 'cat.jpg')) }} "/>
+        <h3 class='text-secondary fs-4'><a href="#" class='text-decoration-none'>{{ post.poster.username }}</a></h3>
         </div>
-        <p class='display-6'><strong>Title: </strong>{{ post.title }}</p>
+        <div class='d-flex gap-3'>
+            {% if  post.poster_id == current_user.id or current_user.id == 3 %}
+            <a href="{{ url_for('edit', id=post.id) }}" class='text-success'><i class="fa-solid fa-file-pen fs-4"></i></a>
+            <a href="{{ url_for('deletepost', id=post.id) }}" class='text-danger'><i class="fa-solid fa-trash fs-4"></i></a>
+            {% endif %}
+        </div>
+        </div>
+        <img width='100%' class='object-fit-scale bg-white' src="{{ url_for('static', filename='images/' + (post.post_pic or 'cat.jpg')) }}" />
+        <p class='fs-3 text-dark'>{{ post.title }}</p>
         <p>{{ post.content }}</p>
-        {% if  post.poster_id == current_user.id or current_user.id == 3 %}
-        <div class='d-flex justify-content-end gap-2'>
-            <a href="{{ url_for('edit', id=post.id) }}" class='btn btn-success col-2'>Update</a>
-            <a href="{{ url_for('deletepost', id=post.id) }}" class='btn btn-danger col-2'>Delete</a>
-        </div>
-        {% endif %}
     </div>
     {% endfor %}
 {% endblock %}

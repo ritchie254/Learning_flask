@@ -97,6 +97,7 @@ class BlogPost(db.Model):
     slug = db.Column(db.String(120), nullable=False)
     content = db.Column(db.String(120), nullable=False)
     poster_id = db.Column(db.Integer, db.ForeignKey('signup_user.id'))
+    post_pic = db.Column(db.String(500), nullable=True)
 
     def __repr__(self):
         return self.title
@@ -344,9 +345,15 @@ def blog():
         title = request.form['title']
         author = request.form['author']
         slug = request.form['slug']
+        post_pic = request.files['pic']
         content = request.form['content']
 
-        post = BlogPost(title=title, author=author, slug=slug, content=content, poster_id=poster)
+        pic = secure_filename(post_pic.filename)
+        pic_name = str(uuid.uuid4())+'-'+pic
+        post_pic.save(os.path.join(app.config['UPLOAD_FOLDER'], pic_name))
+        post_pic = pic_name
+
+        post = BlogPost(title=title, author=author, slug=slug, content=content, poster_id=poster, post_pic=post_pic)
         db.session.add(post)
         db.session.commit()
         return redirect(url_for('home'))
@@ -365,12 +372,23 @@ def edit(id):
             post.author = request.form['author']
             post.slug = request.form['slug']
             post.content = request.form['content']
-            try:
+
+            if request.files['pic']:
+                post.post_pic = request.files['pic']
+                try:
+                    pic = secure_filename(post.post_pic.filename)
+                    pic_name = str(uuid.uuid4())+'-'+pic
+                    post_pic.save(os.path.join(app.config['UPLOAD_FOLDER'], pic_name))
+                    post.post_pic = pic_name
+                    db.session.commit()
+                    flash('Post updated successfully')
+                    return redirect(url_for('home'))
+                except Exception as e:
+                    pass
+            else:
                 db.session.commit()
                 flash('Post updated successfully')
                 return redirect(url_for('home'))
-            except Exception as e:
-                pass
         else:
             flash('Your can not edit this post since you are not the owner')
             return redirect(url_for('home'))

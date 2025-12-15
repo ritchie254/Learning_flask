@@ -1,12 +1,14 @@
 {% extends 'index.html' %}
 {% block content %}
-<form method='post' action='/blog/edit/{{ post.id }}' class='shadow border border-1 p-3'>
+<form method='post' action='/blog/edit/{{ post.id }}' class='shadow border border-1 p-3' enctype='multipart/form-data'>
     <label class='form-label'>Title</label>
     <input type='text' class='form-control' name='title' value={{ post.title }}>
     <label class='form-label'>Author</label>
     <input type='text' class='form-control' name='author' value={{ post.author }}>
     <label class='form-label'>Slug</label>
     <input type='text' class='form-control' name='slug' value={{ post.slug }}>
+    <label for='postpic' class='form-label'>Post</label>
+    <input type='file' name='pic' id='postpic' class='form-control' />
     <label class='form-label'>Content</label>
     <textarea rows=3 type='text' class='form-control' name='content' value={{ post.content }}></textarea>
     <button class='btn btn-secondary mt-2'>Update</button>
