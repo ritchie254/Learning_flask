@@ -7,14 +7,19 @@ from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_migrate import Migrate
 from flask_login import UserMixin, LoginManager, login_required, login_user, logout_user, current_user
+from werkzeug.utils import secure_filename
+import os
+import uuid as uuid
 
 
 
 app = Flask(__name__)
+
+UPLOAD_FOLDER = 'static/images/'
 # old sqllite db
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///user.db'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost/blog'
-
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['SECRET_KEY'] = '1234567890'
 #bp = Blueprint('/auth', __name__, url_prefix='/auth')
 
@@ -80,6 +85,7 @@ class SignupUser(db.Model, UserMixin):
     date_created = db.Column(db.DateTime, default=datetime.utcnow)
     password = db.Column(db.String(200), nullable=False)
     posts = db.Relationship('BlogPost', backref='poster')
+    profile_pic = db.Column(db.String(500), nullable=True)
 
     def __repr__(self):
         return self.FirstName
@@ -111,6 +117,12 @@ class SearchForm(FlaskForm):
 def index():
     form = SearchForm()
     return dict(form=form)
+
+@app.route('/admin')
+@login_required
+def admin():
+    users = SignupUser.query.order_by(SignupUser.id).all()
+    return render_template('admin.html', users=users)
 
 @app.route('/', strict_slashes=False)
 @login_required
@@ -244,7 +256,13 @@ def updateUser(id):
         user.FirstName = request.form['FirstName']
         user.LastName = request.form['LastName']
         user.email = request.form['email']
+        user.profile_pic = request.files['file']
 
+        pic_filename = secure_filename(user.profile_pic.filename)
+        pic_name = str(uuid.uuid4()) + '-' + pic_filename
+        #save the profile pic to ststic/images folder
+        user.profile_pic.save(os.path.join(app.config['UPLOAD_FOLDER'], pic_name))
+        user.profile_pic = pic_name
         try:
             db.session.commit()
             flash('User updated successfully')
@@ -290,7 +308,7 @@ def deletepost(id):
     blogToDelete = BlogPost.query.get_or_404(id)
     post_owner = current_user.id
 
-    if post_owner == blogToDelete.poster_id:
+    if post_owner == blogToDelete.poster_id or post_owner == 3:
         try:
             db.session.delete(blogToDelete)
             db.session.commit()
@@ -342,7 +360,7 @@ def edit(id):
     post_owner = current_user.id
 
     if request.method=='POST':
-        if post_owner == post.poster_id:
+        if post_owner == post.poster_id or post_owner == 3:
             post.title = request.form['title']
             post.author = request.form['author']
             post.slug = request.form['slug']

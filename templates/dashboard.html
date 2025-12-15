@@ -4,16 +4,24 @@
       <div class="card-header text-primary">
           <h1>Your Dashboard</h1>
       </div>
-      <div class="card-body p-3">
-          <h5 class="card-title">Welcome to your account dashboard</h5>
+      <div class="card-body p-3 overflow-hidden">
+          <h5 class="card-title text-dark">Welcome to your account dashboard</h5>
+          {% if current_user.profile_pic %}
+            <img width='200' height='200' class="object-fit-cover border rounded-circle border-primary border-5 p-1 mb-4" src='{{ url_for('static', filename="images/"+ current_user.profile_pic) }}' />
+            {% else %}
+            <img width='200' height='200' class="object-fit-cover border rounded-cir    cle border-primary border-5 p-1 mb-4" src='{{ url_for('static', filename="images/cat.jpg") }}' />
+          {% endif %}
           <p class="card-text">
           <strong>UserName: </strong>{{ current_user.username }}<br>
           <strong>First Name: </strong>{{ current_user.FirstName }}<br>
           <strong>Last Name: </strong>{{ current_user.LastName }}<br>
           <strong>Email: </strong>{{ current_user.email }}<br>
           </p>
-          <a href="{{ url_for('logout') }}" class="btn btn-secondary col-3">logout</a>
-          <a href="{{ url_for('updateUser', id=current_user.id) }}" class="btn btn-secondary col-3">Update</a>
+          <a href="{{ url_for('logout') }}" class="btn btn-warning col-3">logout</a>
+          <a href="{{ url_for('updateUser', id=current_user.id) }}" class="btn btn-success col-3">Update</a>
+          {% if current_user.id == 3 %}
+            <a href="{{ url_for('admin') }}" class="btn btn-primary col-3">Admin</a>
+        {% endif %}
                                     </div>
 </div>
 <div class="card mt-5 border-primary">

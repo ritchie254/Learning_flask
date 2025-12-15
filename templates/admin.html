@@ -1,0 +1,10 @@
+{% extends 'index.html' %}
+{% block content %}
+<h2>Admin page</h2>
+<h3> Edit any user </h3>
+{% for user in users %}
+{% if user.id != 3 %}
+<p class='mb-3'>{{ user.username }} <a href="{{ url_for('updateUser', id=user.id) }}" class="btn btn-primary ms-3">Update</a><br></p>
+{% endif %}
+{% endfor %}
+{% endblock %}

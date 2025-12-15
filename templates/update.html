@@ -1,14 +1,16 @@
 {% extends 'index.html' %}
 {% block content %}
-<form method='post' class='shadow border border-success bg-info bg-opacity-10 rounded-5 p-4 mt-4' action='/dashboard/update/{{ user.id }}'>
+<form method='post' class='shadow border border-success p-4 mt-4' action='/dashboard/update/{{ user.id }}' enctype='multipart/form-data'>
     <label class='form-label' for='fn'>UserName</label>
-    <input type='text' class='form-control' id='fn' name='username' value={{ current_user.username }} />
+    <input type='text' class='form-control' id='fn' name='username' value={{ user.username }} />
     <label class='form-label' for='fn'>Firstname</label>
-    <input type='text' class='form-control' id='fn' name='FirstName' value={{ current_user.FirstName }} />
+    <input type='text' class='form-control' id='fn' name='FirstName' value={{ user.FirstName }} />
     <label class='form-label' for='ln'>Lastname</label>
-    <input type='text' class='form-control' id='ln' name='LastName' value={{ current_user.LastName }} />
+    <input type='text' class='form-control' id='ln' name='LastName' value={{ user.LastName }} />
     <label class='form-label' for='em'>Email</label>
-    <input type='email' class='form-control' id='em' name='email' value={{ current_user.email }} />
+    <input type='email' class='form-control' id='em' name='email' value={{ user.email }} />
+    <label class='form-label' for='pic'>Profile Pic</label>
+    <input type='file' class='form-control' id='pic' name='file' value={{ user.profile_pic }}/>
     <button class='btn btn-success mt-3 col-3'>Update</button>
 </form>
 {% endblock %}

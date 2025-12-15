@@ -30,6 +30,11 @@
                                                                                                                           <li class="nav-item">
                                                                                                                               <a class="nav-link" href="{{ url_for('user') }}">AddUser</a>
                                                                                                                           </li>
+                                                                                                                          {% if current_user.id == 3 %}
+                                                                                                                            <li class="nav-item">
+                                                                                                                                 <a class="nav-link" href="{{ url_for('admin') }}">Admin</a>
+                                                                                                                            </li>
+                                                                                                                          {% endif %}
                                                                                                                           <li class='nav-item'>
                                                                                                                               <a class="nav-link" href="{{ url_for('blog') }}">New Blog</a>
                                                                                                                           </li>
